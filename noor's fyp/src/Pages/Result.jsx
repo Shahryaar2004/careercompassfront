@@ -11,10 +11,10 @@ const Result = () => {
   const fetchHistory = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("https://careercompassbackend-1.onrender.com/history", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+const res = await axios.get("https://careercompassbackend.onrender.com/api/assessments/history", {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
       });
       setHistory(Array.isArray(res.data) ? res.data : [res.data]);
     } catch (err) {
@@ -38,7 +38,7 @@ const Result = () => {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://careercompassbackend-1.onrender.com/delete/${id}`, {
+      await axios.delete(`https://careercompassbackend-1.onrender.com/api/assessments/delete/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

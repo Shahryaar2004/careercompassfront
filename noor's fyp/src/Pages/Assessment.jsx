@@ -84,11 +84,11 @@ const Assessment = () => {
       };
 
       // Dispatches processing data straight to the server instance
-      await axios.post("https://careercompassbackend-1.onrender.com/save", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      await axios.post("https://careercompassbackend.onrender.com/api/assessments/save", payload, {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+});
 
       // Enforce animation window buffer so matching metrics text sequence doesn't cut off abruptly
       const timeElapsed = Date.now() - startTime;

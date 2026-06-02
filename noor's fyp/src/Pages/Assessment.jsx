@@ -84,7 +84,7 @@ const Assessment = () => {
       };
 
       // Dispatches processing data straight to the server instance
-      await axios.post("https://careercompassbackend.onrender.com/save", payload, {
+      await axios.post("https://careercompassbackend-1.onrender.com/save", payload, {
         headers: {
           Authorization: `Bearer ${token}`
         }

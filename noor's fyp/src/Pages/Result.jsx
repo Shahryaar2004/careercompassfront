@@ -11,7 +11,7 @@ const Result = () => {
   const fetchHistory = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("https://careercompassbackend.onrender.com/history", {
+      const res = await axios.get("https://careercompassbackend-1.onrender.com/history", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -38,7 +38,7 @@ const Result = () => {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://careercompassbackend.onrender.com/delete/${id}`, {
+      await axios.delete(`https://careercompassbackend-1.onrender.com/delete/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

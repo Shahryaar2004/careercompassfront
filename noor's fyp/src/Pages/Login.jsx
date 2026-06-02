@@ -12,7 +12,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post('https://careercompassbackend.onrender.com/login', formData);
+      const res = await axios.post('https://careercompassbackend-1.onrender.com/login', formData);
       
       // Save the token and user data to localStorage
       localStorage.setItem('token', res.data.token);

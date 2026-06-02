@@ -1,0 +1,155 @@
+/* ==========================================================================
+   COMPLETE UPDATED RESULT CSS (Scrollbar Fixed & Mobile Responsive)
+   ========================================================================== */
+
+.result-page {
+  background: #0f1226;
+  min-height: 100vh;
+  width: 90%; /* 🔴 FIX: Swapped 100vw to 100% to permanently kill bottom scrollbar */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* 🔴 FIX: Changed to flex-start so long history lists can scroll vertically naturally */
+  padding: 100px 20px 40px 20px; /* Top padding protects space below your fixed Navbar */
+  color: white;
+  font-family: "Segoe UI", sans-serif;
+  box-sizing: border-box;
+  overflow-x: hidden; /* 🔴 FIX: Safety latch ensuring zero horizontal overflow leakage */
+}
+
+.result-container {
+  text-align: center;
+  max-width: 800px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.icon {
+  font-size: 30px;
+}
+
+.title {
+  color: #f5a623;
+  margin: 10px 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.subtitle {
+  color: #aaa;
+  margin-bottom: 30px;
+  font-size: 15px;
+}
+
+/* --- Dynamic Grid Layout --- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Two columns side-by-side on desktop views */
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* --- Assessment Card --- */
+.card {
+  background: #1a1d3a;
+  padding: 24px;
+  border-radius: 12px;
+  text-align: left;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative; /* Useful for absolute delete targets if needed */
+  box-sizing: border-box;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  border-color: rgba(245, 166, 35, 0.3); /* Subtle color highlight matching your theme on hover */
+}
+
+.card-title {
+  font-size: 12px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+/* --- Progress Bar --- */
+.progress {
+  height: 6px;
+  background: #252849;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #f5a623; /* Ties progress color right back to your theme profile marker */
+  transition: width 0.5s ease;
+}
+
+/* --- Matches & Skills Section --- */
+.matches {
+  margin-top: 20px;
+}
+
+.match-title {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 8px;
+}
+
+/* --- Badges Layout --- */
+.badges {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap; /* Guarantees badges drop down wrap instead of blowing past container widths */
+  gap: 8px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #f5a623;
+  color: #f5a623;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.badge:hover {
+  background: #f5a623;
+  color: #0f1226;
+  cursor: default;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 📱 MOBILE RESPONSIVE MEDIA BREAKPOINT (768px)                              */
+/* -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .result-page {
+    padding-top: 90px; /* Snugger padding layout for safe phone orientation view */
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  /* 🔴 THE RESPONSIVE FIX: Collapses the 2-column layout grid to a single column on mobile */
+  .grid {
+    grid-template-columns: 1fr; 
+    gap: 16px;
+  }
+  
+  .card {
+    padding: 18px;
+  }
+}

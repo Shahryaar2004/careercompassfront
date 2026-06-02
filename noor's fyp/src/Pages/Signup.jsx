@@ -20,7 +20,7 @@ const Signup = () => {
     };
 
     try {
-      await axios.post('http://localhost:5000/api/auth/signup', submissionData);
+      await axios.post('https://careercompassbackend.onrender.com/signup', submissionData);
       toast.success("Registration successful!");
       navigate("/");
     } catch (err) {

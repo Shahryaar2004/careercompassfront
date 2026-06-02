@@ -1,13 +1,13 @@
 import React from "react";
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 
-import Home from "./pages/Home";
-import Instructions from "./pages/Instructions";
-import Assessment from "./pages/Assessment";
-import Result from "./pages/Result";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import Navbar from "./pages/Navbar"; 
+import Home from "./Pages/Home";
+import Instructions from "./Pages/Instructions";
+import Assessment from "./Pages/Assessment";
+import Result from "./Pages/Result";
+import Login from "./Pages/Login";
+import Signup from "./Pages/Signup";
+import Navbar from "./Pages/Navbar";
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

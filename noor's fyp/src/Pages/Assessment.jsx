@@ -130,7 +130,7 @@ const handleSubmitAssessment = async () => {
     };
 
     // 3. Fire the request to your live backend
-    await axios.post("https://careercompassbackend.onrender.com/api/assessments/save", requestBody, {
+    await axios.post("https://careercompassbackend-1.onrender.com/api/assessments/save", requestBody, {
       headers: {
         Authorization: `Bearer ${token}`
       }

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios"; 
 import questions from "../data/questions";
 import "../styles/Assessment.css";
-
+import { analyzeCareerFromAnswers } from "../lib/careerAnalyzer";
 const Assessment = () => {
   const navigate = useNavigate();
 
@@ -64,35 +64,90 @@ const Assessment = () => {
     }
   };
 
-  const handleSubmitAssessment = async () => {
-    setLoading(true);
+//   const handleSubmitAssessment = async () => {
+//     setLoading(true);
     
-    // Create execution timestamp anchor point to enforce a premium calculation delay animation duration
+//     // Create execution timestamp anchor point to enforce a premium calculation delay animation duration
+//     const startTime = Date.now();
+
+//     try {
+//       const token = localStorage.getItem("token");
+
+//       const payload = {
+//         responses: answers,
+//         recommendation: {
+//           primaryField: "Software Engineering",
+//           confidenceScore: 88,
+//           analysisDate: new Date()
+//         },
+//         suggested_skills: ["JavaScript", "React.js", "Node.js", "Problem Solving"] 
+//       };
+
+//       // Dispatches processing data straight to the server instance
+//       await axios.post("https://careercompassbackend.onrender.com/api/assessments/save", payload, {
+//   headers: {
+//     Authorization: `Bearer ${token}`
+//   }
+// });
+
+//       // Enforce animation window buffer so matching metrics text sequence doesn't cut off abruptly
+//       const timeElapsed = Date.now() - startTime;
+//       const minimalDuration = 4500; // 4.5 seconds to ensure clean layout sequencing
+      
+//       if (timeElapsed < minimalDuration) {
+//         setTimeout(() => {
+//           navigate("/result");
+//         }, minimalDuration - timeElapsed);
+//       } else {
+//         navigate("/result");
+//       }
+
+//     } catch (err) {
+//       console.error("Failed to save assessment:", err);
+//       alert("Database error: Could not save your answers.");
+//       navigate("/result");
+//     }
+//   };
+
+ const handleSubmitAssessment = async () => {
+    setLoading(true);
     const startTime = Date.now();
 
     try {
       const token = localStorage.getItem("token");
 
+      // 1. Map indexed state answers to the descriptive array careerAnalyzer.js expects
+      const formattedAnswersForAI = questions.map((q, idx) => ({
+        questionId: idx,
+        question: q.question,
+        selectedAnswer: q.options[answers[idx]] || "No answer selected"
+      }));
+
+      // 2. Call your OpenAI utility helper from the lib folder
+      const aiResult = await analyzeCareerFromAnswers(formattedAnswersForAI);
+
+      // 3. Build the payload using live, dynamic AI feedback data points
       const payload = {
         responses: answers,
         recommendation: {
-          primaryField: "Software Engineering",
-          confidenceScore: 88,
-          analysisDate: new Date()
+          primaryField: aiResult.recommended_field,
+          confidenceScore: aiResult.confidence === "High" ? 95 : aiResult.confidence === "Medium" ? 75 : 50,
+          analysisDate: new Date(),
+          reasoning: aiResult.reasoning
         },
-        suggested_skills: ["JavaScript", "React.js", "Node.js", "Problem Solving"] 
+        suggested_skills: aiResult.suggested_skills 
       };
 
-      // Dispatches processing data straight to the server instance
+      // 4. Post the live payload string matrix to your running backend database
       await axios.post("https://careercompassbackend.onrender.com/api/assessments/save", payload, {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
-});
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
 
-      // Enforce animation window buffer so matching metrics text sequence doesn't cut off abruptly
+      // Maintain visual sequencing delay buffer 
       const timeElapsed = Date.now() - startTime;
-      const minimalDuration = 4500; // 4.5 seconds to ensure clean layout sequencing
+      const minimalDuration = 4500; 
       
       if (timeElapsed < minimalDuration) {
         setTimeout(() => {
@@ -103,13 +158,13 @@ const Assessment = () => {
       }
 
     } catch (err) {
-      console.error("Failed to save assessment:", err);
-      alert("Database error: Could not save your answers.");
-      navigate("/result");
+      console.error("Failed to process profile or save assessment structure:", err);
+      alert(err.message || "An error occurred while communicating with the AI evaluation engine.");
+      setLoading(false);
     }
   };
 
-  const answeredCount = Object.keys(answers).length;
+const answeredCount = Object.keys(answers).length;
   const progress = Math.round((answeredCount / questions.length) * 100);
   const isLastQuestion = current === questions.length - 1;
 

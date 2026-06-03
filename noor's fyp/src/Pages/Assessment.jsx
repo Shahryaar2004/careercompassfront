@@ -256,8 +256,138 @@
 
 // export default Assessment;
 
+// import React, { useState, useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { loadAnswers, upsertAnswer, analyzeCareerFromAnswers } from "../lib/answersStore";
+
+// export default function Assessment() {
+//   const navigate = useNavigate();
+//   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+//   const [answers, setAnswers] = useState([]);
+//   const [loading, setLoading] = useState(false);
+
+//   const questions = [
+//     {
+//       id: 0,
+//       question: "Which tasks do you enjoy working on the most?",
+//       options: [
+//         "Building user interfaces and layout designs", 
+//         "Writing backend server logic and databases", 
+//         "Analyzing statistical data patterns", 
+//         "Managing system infrastructure and deployments"
+//       ]
+//     },
+//     {
+//       id: 1,
+//       question: "How do you prefer to solve technical challenges?",
+//       options: [
+//         "Visually sketching out component structures", 
+//         "Tracing data control flows step-by-step", 
+//         "Applying mathematical formulas and algorithms", 
+//         "Automating repetitive script workflows"
+//       ]
+//     }
+//   ];
+
+//   useEffect(() => {
+//     const saved = loadAnswers();
+//     setAnswers(saved);
+//   }, []);
+
+//   const handleSelectOption = (optionIndex) => {
+//     const currentQuestion = questions[currentQuestionIndex];
+//     const updated = upsertAnswer({
+//       questionId: currentQuestion.id,
+//       question: currentQuestion.question,
+//       selectedAnswer: currentQuestion.options[optionIndex]
+//     });
+//     setAnswers(updated);
+//   };
+
+//   const handleNext = () => {
+//     if (currentQuestionIndex < questions.length - 1) {
+//       setCurrentQuestionIndex(currentQuestionIndex + 1);
+//     }
+//   };
+
+//   const handlePrevious = () => {
+//     if (currentQuestionIndex > 0) {
+//       setCurrentQuestionIndex(currentQuestionIndex - 1);
+//     }
+//   };
+
+//   const handleSubmit = async () => {
+//     setLoading(true);
+//     try {
+//       const assessmentResult = await analyzeCareerFromAnswers(answers);
+//       localStorage.setItem("latestAssessmentResult", JSON.stringify(assessmentResult));
+//       navigate("/result");
+//     } catch (err) {
+//       console.error("Submission failed:", err.message);
+//       alert("Could not process your results. Please verify your server is running.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const currentQuestion = questions[currentQuestionIndex];
+//   const currentSavedAnswer = answers.find((a) => a.questionId === currentQuestion.id);
+
+//   if (loading) {
+//     return (
+//       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", fontFamily: "sans-serif" }}>
+//         <h2>Analyzing your profile attributes using Gemini Core Engine...</h2>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div style={{ maxWidth: "600px", margin: "50px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "8px", fontFamily: "sans-serif" }}>
+//       <h3>Question {currentQuestionIndex + 1} of {questions.length}</h3>
+//       <p style={{ fontSize: "18px", fontWeight: "bold" }}>{currentQuestion.question}</p>
+      
+//       <div style={{ display: "flex", flexDirection: "column", gap: "10px", margin: "20px 0" }}>
+//         {currentQuestion.options.map((option, idx) => (
+//           <button
+//             key={idx}
+//             onClick={() => handleSelectOption(idx)}
+//             style={{
+//               padding: "12px",
+//               textAlign: "left",
+//               backgroundColor: currentSavedAnswer?.selectedAnswer === option ? "#d1e7dd" : "#f8f9fa",
+//               border: "1px solid #ccc",
+//               borderRadius: "4px",
+//               cursor: "pointer"
+//             }}
+//           >
+//             {option}
+//           </button>
+//         ))}
+//       </div>
+
+//       <div style={{ display: "flex", justifyContent: "space-between", marginTop: "30px" }}>
+//         <button onClick={handlePrevious} disabled={currentQuestionIndex === 0} style={{ padding: "10px 20px", cursor: "pointer" }}>
+//           Previous
+//         </button>
+
+//         {currentQuestionIndex === questions.length - 1 ? (
+//           <button onClick={handleSubmit} disabled={answers.length < questions.length} style={{ padding: "10px 20px", backgroundColor: "#0d6efd", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}>
+//             See Results
+//           </button>
+//         ) : (
+//           <button onClick={handleNext} style={{ padding: "10px 20px", cursor: "pointer" }}>
+//             Next
+//           </button>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import questions from "../data/questions"; // ✅ Fixed: Import your full questionnaire bank!
+import "../styles/Assessment.css";       // ✅ Fixed: Bring back your professional CSS styling
 import { loadAnswers, upsertAnswer, analyzeCareerFromAnswers } from "../lib/answersStore";
 
 export default function Assessment() {
@@ -266,29 +396,35 @@ export default function Assessment() {
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const questions = [
-    {
-      id: 0,
-      question: "Which tasks do you enjoy working on the most?",
-      options: [
-        "Building user interfaces and layout designs", 
-        "Writing backend server logic and databases", 
-        "Analyzing statistical data patterns", 
-        "Managing system infrastructure and deployments"
-      ]
-    },
-    {
-      id: 1,
-      question: "How do you prefer to solve technical challenges?",
-      options: [
-        "Visually sketching out component structures", 
-        "Tracing data control flows step-by-step", 
-        "Applying mathematical formulas and algorithms", 
-        "Automating repetitive script workflows"
-      ]
-    }
+  // ⚙️ Algorithm Loading Text Loop
+  const [analysisStep, setAnalysisStep] = useState(0);
+  const analysisMessages = [
+    "Compiling contextual behavioral metrics...",
+    "Executing heuristic career matrix mapping...",
+    "Matching profile against regional market trends...",
+    "Synthesizing customized skill track vectors...",
+    "Finalizing diagnostic career summary..."
   ];
 
+  // Cycles through analysis messages while Gemini is processing the payload
+  useEffect(() => {
+    let interval;
+    if (loading) {
+      interval = setInterval(() => {
+        setAnalysisStep((prevStep) => {
+          if (prevStep < analysisMessages.length - 1) {
+            return prevStep + 1;
+          }
+          return prevStep;
+        });
+      }, 900);
+    } else {
+      setAnalysisStep(0);
+    }
+    return () => clearInterval(interval);
+  }, [loading]);
+
+  // Load answers from local browser cache on initial mount
   useEffect(() => {
     const saved = loadAnswers();
     setAnswers(saved);
@@ -297,7 +433,7 @@ export default function Assessment() {
   const handleSelectOption = (optionIndex) => {
     const currentQuestion = questions[currentQuestionIndex];
     const updated = upsertAnswer({
-      questionId: currentQuestion.id,
+      questionId: currentQuestionIndex, // Uses index directly to keep it aligned with backend loops
       question: currentQuestion.question,
       selectedAnswer: currentQuestion.options[optionIndex]
     });
@@ -306,79 +442,157 @@ export default function Assessment() {
 
   const handleNext = () => {
     if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      const nextIndex = currentQuestionIndex + 1;
+      setCurrentQuestionIndex(nextIndex);
     }
   };
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
+      const prevIndex = currentQuestionIndex - 1;
+      setCurrentQuestionIndex(prevIndex);
     }
   };
 
   const handleSubmit = async () => {
     setLoading(true);
+    const startTime = Date.now();
+
     try {
       const assessmentResult = await analyzeCareerFromAnswers(answers);
       localStorage.setItem("latestAssessmentResult", JSON.stringify(assessmentResult));
-      navigate("/result");
+      
+      // Enforce an absolute minimum delay buffer so the professor gets to see your cool processing text sequence!
+      const timeElapsed = Date.now() - startTime;
+      const minimalDuration = 4500; 
+      
+      if (timeElapsed < minimalDuration) {
+        setTimeout(() => {
+          navigate("/result");
+        }, minimalDuration - timeElapsed);
+      } else {
+        navigate("/result");
+      }
     } catch (err) {
       console.error("Submission failed:", err.message);
       alert("Could not process your results. Please verify your server is running.");
-    } finally {
       setLoading(false);
     }
   };
 
+  const answeredCount = Object.keys(answers).length;
+  const progress = Math.round((answeredCount / questions.length) * 100);
+  const isLastQuestion = currentQuestionIndex === questions.length - 1;
+
   const currentQuestion = questions[currentQuestionIndex];
-  const currentSavedAnswer = answers.find((a) => a.questionId === currentQuestion.id);
+  const currentSavedAnswer = answers.find((a) => a.questionId === currentQuestionIndex);
 
   if (loading) {
     return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", fontFamily: "sans-serif" }}>
-        <h2>Analyzing your profile attributes using Gemini Core Engine...</h2>
+      <div style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(15, 12, 38, 0.95)",
+        backdropFilter: "blur(16px)",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 5000,
+        color: "white",
+        fontFamily: "sans-serif"
+      }}>
+        {/* Animated Loading Spinner */}
+        <div style={{
+          width: "60px",
+          height: "60px",
+          border: "4px solid rgba(245, 166, 35, 0.1)",
+          borderTop: "4px solid #f5a623",
+          borderRadius: "50%",
+          animation: "spin 1s linear infinite",
+          marginBottom: "30px"
+        }}></div>
+        
+        <h2 style={{ fontSize: "24px", fontWeight: "600", letterSpacing: "0.5px", marginBottom: "10px" }}>
+          Analyzing Profile Engine
+        </h2>
+        
+        <p style={{ fontSize: "15px", color: "#a095b5", minHeight: "24px", transition: "all 0.3s ease" }}>
+          {analysisMessages[analysisStep]}
+        </p>
+
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: "600px", margin: "50px auto", padding: "20px", border: "1px solid #ccc", borderRadius: "8px", fontFamily: "sans-serif" }}>
-      <h3>Question {currentQuestionIndex + 1} of {questions.length}</h3>
-      <p style={{ fontSize: "18px", fontWeight: "bold" }}>{currentQuestion.question}</p>
-      
-      <div style={{ display: "flex", flexDirection: "column", gap: "10px", margin: "20px 0" }}>
-        {currentQuestion.options.map((option, idx) => (
+    <div className="assessment-container">
+      <div className="card">
+        <div className="top-bar">
+          <span>
+            Question {currentQuestionIndex + 1} of {questions.length}
+          </span>
+          <span>{progress}%</span>
+        </div>
+        
+        <div className="progress-bar">
+          <div
+            className="progress-fill"
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+        
+        {currentQuestion.category && <p className="category">{currentQuestion.category}</p>}
+        <h2 className="question">{currentQuestion.question}</h2>
+        
+        <div className="options">
+          {currentQuestion.options.map((option, index) => (
+            <div
+              key={index}
+              className={`option ${currentSavedAnswer?.selectedAnswer === option ? "active" : ""}`}
+              onClick={() => handleSelectOption(index)}
+            >
+              <span className="option-letter">
+                {String.fromCharCode(65 + index)}
+              </span>
+              <span>{option}</span>
+            </div>
+          ))}
+        </div>
+        
+        <div className="bottom">
           <button
-            key={idx}
-            onClick={() => handleSelectOption(idx)}
-            style={{
-              padding: "12px",
-              textAlign: "left",
-              backgroundColor: currentSavedAnswer?.selectedAnswer === option ? "#d1e7dd" : "#f8f9fa",
-              border: "1px solid #ccc",
-              borderRadius: "4px",
-              cursor: "pointer"
-            }}
+            className="prev"
+            onClick={handlePrevious}
+            disabled={currentQuestionIndex === 0 || loading}
           >
-            {option}
+            ← Previous
           </button>
-        ))}
-      </div>
 
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "30px" }}>
-        <button onClick={handlePrevious} disabled={currentQuestionIndex === 0} style={{ padding: "10px 20px", cursor: "pointer" }}>
-          Previous
-        </button>
+          <span className="counter">
+            {answeredCount} / {questions.length} answered
+          </span>
 
-        {currentQuestionIndex === questions.length - 1 ? (
-          <button onClick={handleSubmit} disabled={answers.length < questions.length} style={{ padding: "10px 20px", backgroundColor: "#0d6efd", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}>
-            See Results
+          <button
+            className="next"
+            onClick={() => {
+              if (isLastQuestion) {
+                handleSubmit();
+              } else {
+                handleNext();
+              }
+            }}
+            disabled={!currentSavedAnswer || loading}
+          >
+            {isLastQuestion ? "See Results →" : "Next →"}
           </button>
-        ) : (
-          <button onClick={handleNext} style={{ padding: "10px 20px", cursor: "pointer" }}>
-            Next
-          </button>
-        )}
+        </div>
       </div>
     </div>
   );

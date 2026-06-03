@@ -1,182 +1,102 @@
 const questions = [
   {
-    category: "INTERESTS",
-    question: "Which activity would you most enjoy spending your day on?",
+    question: "Which core development tasks do you enjoy working on the most?",
+    category: "Technical Preference",
     options: [
-      "Designing and building something physical or digital",
-      "Analyzing data and solving complex puzzles",
-      "Helping people solve personal or professional problems",
-      "Creating art, writing, or music"
+      "Building user interfaces, animations, and responsive layout designs",
+      "Writing backend server logic, routing, and structuring databases",
+      "Analyzing data patterns, designing analytics, or training ML models",
+      "Configuring cloud servers, deployment pipelines, and Docker containers"
     ]
   },
   {
-    category: "SKILLS",
-    question: "Which skill do you feel most confident about?",
+    question: "How do you naturally prefer to solve technical challenges?",
+    category: "Problem Solving Style",
     options: [
-      "Technical or engineering skills",
-      "Problem-solving and analytical thinking",
-      "Communication and interpersonal skills",
-      "Creativity and imagination"
+      "Visually sketching out component trees and UI wireframes",
+      "Tracing runtime data flows, request payloads, and logic gates",
+      "Applying mathematical structures, metrics, and deep algorithmic formulas",
+      "Automating repetitive shell tasks and writing utility scripts"
     ]
   },
   {
-    category: "WORK STYLE",
-    question: "What type of work environment do you prefer?",
+    question: "Which of these project descriptions excites you the most?",
+    category: "Project Interest",
     options: [
-      "Working with tools, machines, or code",
-      "Working with data and systems",
-      "Working with people and teams",
-      "Working independently on creative tasks"
+      "An interactive dashboard with smooth transitions and stunning CSS graphics",
+      "A high-performance payment processing engine handling millions of requests",
+      "An intelligent system that tags images or filters spam comments dynamically",
+      "A server setup that self-heals and automatically handles heavy viral traffic"
     ]
   },
   {
-    category: "PERSONALITY",
-    question: "How do others usually describe you?",
+    question: "When an application throws an error, where do you look first?",
+    category: "Debugging Behavior",
     options: [
-      "Practical and hands-on",
-      "Logical and analytical",
-      "Empathetic and supportive",
-      "Creative and expressive"
+      "The Browser Developer Tools, console warnings, and CSS layout grids",
+      "Server log streams, API status codes, and database query executions",
+      "Python runtime error stacks, matrix shapes, and variable distributions",
+      "System environment variables, configuration files, and terminal ports"
     ]
   },
   {
-    category: "INTERESTS",
-    question: "What excites you the most?",
+    question: "What is your favorite layer of an application to optimize?",
+    category: "Optimization Target",
     options: [
-      "Building or creating things",
-      "Solving complex challenges",
-      "Helping others succeed",
-      "Expressing ideas creatively"
+      "Bundle size compression, rendering speeds, and image lazy-loading",
+      "Database indexing, cache layers, and complex SQL/NoSQL aggregations",
+      "Model inference latency, feature selection, and algorithm complexity",
+      "Continuous integration speeds, asset compilation, and cluster scaling"
     ]
   },
   {
-    category: "SKILLS",
-    question: "Which task would you choose first?",
+    question: "Which tech stack or ecosystem feels most comfortable to you?",
+    category: "Ecosystem Familiarity",
     options: [
-      "Developing an app or product",
-      "Analyzing a dataset",
-      "Advising someone on a problem",
-      "Designing a poster or story"
+      "React.js, Tailwind CSS, HTML5, and Figma tools",
+      "Node.js, Express, MongoDB, and SQL databases",
+      "Python, FastAPI, TensorFlow, and Pandas documentation",
+      "Linux bash terminals, Docker, AWS, and Git workflows"
     ]
   },
   {
-    category: "WORK STYLE",
-    question: "How do you prefer to work?",
+    question: "How do you prefer to think about a software application?",
+    category: "System Conceptualization",
     options: [
-      "Hands-on and practical",
-      "Structured and logical",
-      "Collaborative and social",
-      "Flexible and creative"
+      "As a digital canvas focused on user interaction and accessibility",
+      "As a series of interconnected microservices passing secure data models",
+      "As a mathematical function converting raw data features into insights",
+      "As an infrastructure pipeline that must remain stable and secure"
     ]
   },
   {
-    category: "PERSONALITY",
-    question: "What motivates you most?",
+    question: "What kind of open-source libraries do you find yourself installing?",
+    category: "Dependency Selection",
     options: [
-      "Creating useful things",
-      "Understanding how things work",
-      "Making a difference in people’s lives",
-      "Expressing creativity"
+      "UI libraries like Framer Motion, Lucide Icons, or Material UI",
+      "Utility libraries like Mongoose, Axios, bcrypt, or jsonwebtoken",
+      "AI/Analytics modules like TensorFlow.js, NumPy, or Scikit-Learn",
+      "DevOps tools, test suites like Jest, or environment processors"
     ]
   },
   {
-    category: "INTERESTS",
-    question: "Which subject do you enjoy most?",
+    question: "If you were to write a technical blog post, it would be about:",
+    category: "Knowledge Sharing",
     options: [
-      "Engineering / IT",
-      "Mathematics / Data",
-      "Psychology / Business",
-      "Arts / Literature"
+      "Mastering responsive typography, theme switching, and mobile layouts",
+      "Designing clean RESTful architectures and secure JWT auth systems",
+      "Building smart client-side image filters using neural networks",
+      "Configuring zero-downtime deployment workflows on cloud instances"
     ]
   },
   {
-    category: "SKILLS",
-    question: "What are you best at?",
+    question: "What is your long-term goal as a professional developer?",
+    category: "Career Vision",
     options: [
-      "Building systems",
-      "Analyzing information",
-      "Communicating ideas",
-      "Creating designs"
-    ]
-  },
-  {
-    category: "WORK STYLE",
-    question: "Which job sounds ideal?",
-    options: [
-      "Software Engineer",
-      "Data Analyst",
-      "HR Manager",
-      "Graphic Designer"
-    ]
-  },
-  {
-    category: "PERSONALITY",
-    question: "How do you solve problems?",
-    options: [
-      "By building solutions",
-      "By analyzing data",
-      "By discussing with others",
-      "By thinking creatively"
-    ]
-  },
-  {
-    category: "INTERESTS",
-    question: "What would you do in free time?",
-    options: [
-      "Build or code something",
-      "Play puzzle or strategy games",
-      "Talk or help people",
-      "Draw, write, or create"
-    ]
-  },
-  {
-    category: "SKILLS",
-    question: "What do you learn fastest?",
-    options: [
-      "Technical tools",
-      "Data patterns",
-      "Human behavior",
-      "Creative skills"
-    ]
-  },
-  {
-    category: "WORK STYLE",
-    question: "Your ideal workplace is:",
-    options: [
-      "Lab / Tech company",
-      "Analytics firm",
-      "Office with teams",
-      "Studio or freelance"
-    ]
-  },
-  {
-    category: "PERSONALITY",
-    question: "What describes you best?",
-    options: [
-      "Builder",
-      "Thinker",
-      "Helper",
-      "Creator"
-    ]
-  },
-  {
-    category: "INTERESTS",
-    question: "Which activity sounds fun?",
-    options: [
-      "Coding a website",
-      "Solving a mystery puzzle",
-      "Coaching someone",
-      "Making a film or art"
-    ]
-  },
-  {
-    category: "FINAL",
-    question: "What career goal fits you most?",
-    options: [
-      "Technology & Engineering",
-      "Data & Research",
-      "Business & People",
-      "Arts & Creativity"
+      "Frontend Architect designing gorgeous, accessible digital products",
+      "Backend Engineer building bulletproof enterprise systems and APIs",
+      "Data Scientist or AI Engineer translating raw metrics into intelligence",
+      "DevOps Specialist keeping cloud infrastructures automated and scaling"
     ]
   }
 ];

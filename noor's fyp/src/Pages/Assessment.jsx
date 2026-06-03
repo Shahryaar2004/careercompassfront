@@ -386,17 +386,20 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import questions from "../data/questions"; // ✅ Fixed: Import your full questionnaire bank!
-import "../styles/Assessment.css";       // ✅ Fixed: Bring back your professional CSS styling
+import axios from "axios"; 
+import questions from "../data/questions";
+import "../styles/Assessment.css";
 import { loadAnswers, upsertAnswer, analyzeCareerFromAnswers } from "../lib/answersStore";
 
-export default function Assessment() {
+const Assessment = () => {
   const navigate = useNavigate();
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState([]);
-  const [loading, setLoading] = useState(false);
 
-  // ⚙️ Algorithm Loading Text Loop
+  const [current, setCurrent] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [answers, setAnswers] = useState({});
+  const [loading, setLoading] = useState(false); 
+  
+  // ⚙️ Algorithm simulation overlay states
   const [analysisStep, setAnalysisStep] = useState(0);
   const analysisMessages = [
     "Compiling contextual behavioral metrics...",
@@ -406,7 +409,7 @@ export default function Assessment() {
     "Finalizing diagnostic career summary..."
   ];
 
-  // Cycles through analysis messages while Gemini is processing the payload
+  // Cycles through analysis messages while loading is active
   useEffect(() => {
     let interval;
     if (loading) {
@@ -424,47 +427,73 @@ export default function Assessment() {
     return () => clearInterval(interval);
   }, [loading]);
 
-  // Load answers from local browser cache on initial mount
+  // Synergize browser local storage state cache on component initialization
   useEffect(() => {
-    const saved = loadAnswers();
-    setAnswers(saved);
+    const savedList = loadAnswers();
+    const formattedMap = {};
+    savedList.forEach((item) => {
+      const questionMatchIndex = questions.findIndex((q) => q.question === item.question);
+      if (questionMatchIndex !== -1) {
+        const optionIndex = questions[questionMatchIndex].options.indexOf(item.selectedAnswer);
+        if (optionIndex !== -1) {
+          formattedMap[questionMatchIndex] = optionIndex;
+        }
+      }
+    });
+    setAnswers(formattedMap);
+    if (formattedMap[0] !== undefined) {
+      setSelected(formattedMap[0]);
+    }
   }, []);
 
-  const handleSelectOption = (optionIndex) => {
-    const currentQuestion = questions[currentQuestionIndex];
-    const updated = upsertAnswer({
-      questionId: currentQuestionIndex, // Uses index directly to keep it aligned with backend loops
-      question: currentQuestion.question,
-      selectedAnswer: currentQuestion.options[optionIndex]
+  const handleSelect = (index) => {
+    setSelected(index);
+    setAnswers((prev) => ({
+      ...prev,
+      [current]: index,
+    }));
+
+    // Instantly save to our synchronization store utility layout
+    upsertAnswer({
+      questionId: current,
+      question: questions[current].question,
+      selectedAnswer: questions[current].options[index]
     });
-    setAnswers(updated);
   };
 
   const handleNext = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      const nextIndex = currentQuestionIndex + 1;
-      setCurrentQuestionIndex(nextIndex);
+    if (current < questions.length - 1) {
+      const nextIndex = current + 1;
+      setCurrent(nextIndex);
+      setSelected(answers[nextIndex] ?? null);
     }
   };
 
-  const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      const prevIndex = currentQuestionIndex - 1;
-      setCurrentQuestionIndex(prevIndex);
+  const handlePrev = () => {
+    if (current > 0) {
+      const prevIndex = current - 1;
+      setCurrent(prevIndex);
+      setSelected(answers[prevIndex] ?? null);
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmitAssessment = async () => {
     setLoading(true);
     const startTime = Date.now();
 
     try {
-      const assessmentResult = await analyzeCareerFromAnswers(answers);
+      // Re-map our dictionary map state cleanly to match your array structures
+      const cleanArrayPayload = Object.keys(answers).map((key) => ({
+        questionId: parseInt(key),
+        question: questions[key].question,
+        selectedAnswer: questions[key].options[answers[key]]
+      }));
+
+      const assessmentResult = await analyzeCareerFromAnswers(cleanArrayPayload);
       localStorage.setItem("latestAssessmentResult", JSON.stringify(assessmentResult));
-      
-      // Enforce an absolute minimum delay buffer so the professor gets to see your cool processing text sequence!
+
       const timeElapsed = Date.now() - startTime;
-      const minimalDuration = 4500; 
+      const minimalDuration = 4500; // 4.5 seconds execution visual hold
       
       if (timeElapsed < minimalDuration) {
         setTimeout(() => {
@@ -473,70 +502,70 @@ export default function Assessment() {
       } else {
         navigate("/result");
       }
+
     } catch (err) {
-      console.error("Submission failed:", err.message);
-      alert("Could not process your results. Please verify your server is running.");
+      console.error("Submission failed:", err);
+      alert("Submission failed. Check your network or server setup.");
       setLoading(false);
     }
   };
 
   const answeredCount = Object.keys(answers).length;
   const progress = Math.round((answeredCount / questions.length) * 100);
-  const isLastQuestion = currentQuestionIndex === questions.length - 1;
+  const isLastQuestion = current === questions.length - 1;
 
-  const currentQuestion = questions[currentQuestionIndex];
-  const currentSavedAnswer = answers.find((a) => a.questionId === currentQuestionIndex);
-
-  if (loading) {
-    return (
-      <div style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(15, 12, 38, 0.95)",
-        backdropFilter: "blur(16px)",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 5000,
-        color: "white",
-        fontFamily: "sans-serif"
-      }}>
-        {/* Animated Loading Spinner */}
-        <div style={{
-          width: "60px",
-          height: "60px",
-          border: "4px solid rgba(245, 166, 35, 0.1)",
-          borderTop: "4px solid #f5a623",
-          borderRadius: "50%",
-          animation: "spin 1s linear infinite",
-          marginBottom: "30px"
-        }}></div>
-        
-        <h2 style={{ fontSize: "24px", fontWeight: "600", letterSpacing: "0.5px", marginBottom: "10px" }}>
-          Analyzing Profile Engine
-        </h2>
-        
-        <p style={{ fontSize: "15px", color: "#a095b5", minHeight: "24px", transition: "all 0.3s ease" }}>
-          {analysisMessages[analysisStep]}
-        </p>
-
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}</style>
-      </div>
-    );
-  }
+  // 🔒 STRICT SKIP PREVENTION: Disable button if user hasn't selected an option for the current question
+  const isNextButtonDisabled = selected === null || loading;
 
   return (
     <div className="assessment-container">
+      {/* THE EXPERT ALGORITHM ANALYSIS LOADING OVERLAY */}
+      {loading && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(15, 12, 38, 0.95)",
+          backdropFilter: "blur(16px)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          zIndex: 5000,
+          color: "white"
+        }}>
+          {/* Animated Spinner Core */}
+          <div style={{
+            width: "60px",
+            height: "60px",
+            border: "4px solid rgba(245, 166, 35, 0.1)",
+            borderTop: "4px solid #f5a623",
+            borderRadius: "50%",
+            animation: "spin 1s linear infinite",
+            marginBottom: "30px"
+          }}></div>
+          
+          <h2 style={{ fontSize: "24px", fontWeight: "600", letterSpacing: "0.5px", marginBottom: "10px" }}>
+            Analyzing Profile Engine
+          </h2>
+          
+          <p style={{ fontSize: "15px", color: "#a095b5", minHeight: "24px", transition: "all 0.3s ease" }}>
+            {analysisMessages[analysisStep]}
+          </p>
+
+          <style>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      )}
+
+      {/* Main Form Layout Container Card Panel Block */}
       <div className="card">
         <div className="top-bar">
           <span>
-            Question {currentQuestionIndex + 1} of {questions.length}
+            Question {current + 1} of {questions.length}
           </span>
           <span>{progress}%</span>
         </div>
@@ -548,20 +577,20 @@ export default function Assessment() {
           ></div>
         </div>
         
-        {currentQuestion.category && <p className="category">{currentQuestion.category}</p>}
-        <h2 className="question">{currentQuestion.question}</h2>
+        {questions[current].category && <p className="category">{questions[current].category}</p>}
+        <h2 className="question">{questions[current].question}</h2>
         
         <div className="options">
-          {currentQuestion.options.map((option, index) => (
+          {questions[current].options.map((opt, index) => (
             <div
               key={index}
-              className={`option ${currentSavedAnswer?.selectedAnswer === option ? "active" : ""}`}
-              onClick={() => handleSelectOption(index)}
+              className={`option ${selected === index ? "active" : ""}`}
+              onClick={() => handleSelect(index)}
             >
               <span className="option-letter">
                 {String.fromCharCode(65 + index)}
               </span>
-              <span>{option}</span>
+              <span>{opt}</span>
             </div>
           ))}
         </div>
@@ -569,8 +598,8 @@ export default function Assessment() {
         <div className="bottom">
           <button
             className="prev"
-            onClick={handlePrevious}
-            disabled={currentQuestionIndex === 0 || loading}
+            onClick={handlePrev}
+            disabled={current === 0 || loading}
           >
             ← Previous
           </button>
@@ -583,12 +612,12 @@ export default function Assessment() {
             className="next"
             onClick={() => {
               if (isLastQuestion) {
-                handleSubmit();
+                handleSubmitAssessment();
               } else {
                 handleNext();
               }
             }}
-            disabled={!currentSavedAnswer || loading}
+            disabled={isNextButtonDisabled} // ✅ Applied: User cannot skip questions anymore!
           >
             {isLastQuestion ? "See Results →" : "Next →"}
           </button>
@@ -596,4 +625,6 @@ export default function Assessment() {
       </div>
     </div>
   );
-}
+};
+
+export default Assessment;

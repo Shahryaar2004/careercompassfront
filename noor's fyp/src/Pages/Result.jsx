@@ -11,7 +11,7 @@ const Result = () => {
   const fetchHistory = async () => {
     try {
       const token = localStorage.getItem("token");
-const res = await axios.get("https://careercompassbackend.onrender.com/api/assessments/history", {
+const res = await axios.get("https://careercompassbackend-1.onrender.com/api/assessments/history", {
   headers: {
     Authorization: `Bearer ${token}`,
   },

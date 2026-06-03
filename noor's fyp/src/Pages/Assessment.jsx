@@ -111,20 +111,43 @@ const Assessment = () => {
 
 const handleSubmitAssessment = async () => {
   setLoading(true);
+  const startTime = Date.now();
+
   try {
     const token = localStorage.getItem("token");
 
-    // Simply pass the raw answers straight to your secure server instance
-    await axios.post("https://careercompassbackend.onrender.com/api/assessments/save", { answers }, {
+    // 1. Properly map your state answers to descriptive text arrays for GPT
+    const formattedQuestions = questions.map((q, idx) => ({
+      questionId: idx,
+      question: q.question,
+      selectedAnswer: q.options[answers[idx]] || "No answer selected"
+    }));
+
+    // 2. Wrap them cleanly into the request body object payload matching the backend destructuring variables
+    const requestBody = {
+      responses: answers,             // Matches: const { responses } = req.body;
+      formattedQuestions: formattedQuestions // Matches: const { formattedQuestions } = req.body;
+    };
+
+    // 3. Fire the request to your live backend
+    await axios.post("https://careercompassbackend.onrender.com/api/assessments/save", requestBody, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
 
-    navigate("/result");
+    // Handle your premium loading animation buffer logic
+    const timeElapsed = Date.now() - startTime;
+    const minimalDuration = 4500; 
+    if (timeElapsed < minimalDuration) {
+      setTimeout(() => { navigate("/result"); }, minimalDuration - timeElapsed);
+    } else {
+      navigate("/result");
+    }
+
   } catch (err) {
     console.error("Submission failed:", err);
-    alert("Could not process your results.");
+    alert("Submission failed. Look at your terminal/console logs.");
     setLoading(false);
   }
 };

@@ -109,61 +109,25 @@ const Assessment = () => {
 //     }
 //   };
 
- const handleSubmitAssessment = async () => {
-    setLoading(true);
-    const startTime = Date.now();
+const handleSubmitAssessment = async () => {
+  setLoading(true);
+  try {
+    const token = localStorage.getItem("token");
 
-    try {
-      const token = localStorage.getItem("token");
-
-      // 1. Map indexed state answers to the descriptive array careerAnalyzer.js expects
-      const formattedAnswersForAI = questions.map((q, idx) => ({
-        questionId: idx,
-        question: q.question,
-        selectedAnswer: q.options[answers[idx]] || "No answer selected"
-      }));
-
-      // 2. Call your OpenAI utility helper from the lib folder
-      const aiResult = await analyzeCareerFromAnswers(formattedAnswersForAI);
-
-      // 3. Build the payload using live, dynamic AI feedback data points
-      const payload = {
-        responses: answers,
-        recommendation: {
-          primaryField: aiResult.recommended_field,
-          confidenceScore: aiResult.confidence === "High" ? 95 : aiResult.confidence === "Medium" ? 75 : 50,
-          analysisDate: new Date(),
-          reasoning: aiResult.reasoning
-        },
-        suggested_skills: aiResult.suggested_skills 
-      };
-
-      // 4. Post the live payload string matrix to your running backend database
-      await axios.post("https://careercompassbackend.onrender.com/api/assessments/save", payload, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      // Maintain visual sequencing delay buffer 
-      const timeElapsed = Date.now() - startTime;
-      const minimalDuration = 4500; 
-      
-      if (timeElapsed < minimalDuration) {
-        setTimeout(() => {
-          navigate("/result");
-        }, minimalDuration - timeElapsed);
-      } else {
-        navigate("/result");
+    // Simply pass the raw answers straight to your secure server instance
+    await axios.post("https://careercompassbackend.onrender.com/api/assessments/save", { answers }, {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
+    });
 
-    } catch (err) {
-      console.error("Failed to process profile or save assessment structure:", err);
-      alert(err.message || "An error occurred while communicating with the AI evaluation engine.");
-      setLoading(false);
-    }
-  };
-
+    navigate("/result");
+  } catch (err) {
+    console.error("Submission failed:", err);
+    alert("Could not process your results.");
+    setLoading(false);
+  }
+};
 const answeredCount = Object.keys(answers).length;
   const progress = Math.round((answeredCount / questions.length) * 100);
   const isLastQuestion = current === questions.length - 1;
